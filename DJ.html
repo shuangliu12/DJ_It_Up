@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="paper.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script type="text/paperscript" canvas="myCanvas">
+
+var amount = 10;
+var colors = ['blue','red','pink','yellow'];
+radius = view.size.width/5;
+
+for (var i = amount; i > 0; i= i -1){
+    var disc = new Path.Circle(new Point(view.center), radius*i/amount);
+
+    disc.fillColor = colors[i % 4];
+}
+
+
+// var discs = [];
+
+// for (var i = amount; i > 0; i= i -1){
+//     discs.push(new Path.Circle(new Point(view.center), radius*i/amount));
+
+//     discs[amount - i].fillColor = colors[i % 4];
+// }
+
+function onFrame(event){
+  // for (var i = amount; i > 0; i= i - 1){
+  //   // var disc = new Path.Circle(new Point(view.center), radius*i/amount);
+  // disc.radius = radius*Math.random()/10;
+
+  //   disc.fillColor = colors[i % 4];
+  // }
+
+}
+
+</script>
+</head>
+<body>
+<!--   <audio id = "sound" controls="controls" preload="auto">
+  <source src="music.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio> -->
+  <canvas id="myCanvas", resize></canvas>
+     <script>
+
+    </script>
+
+
+</body>
+</html>
