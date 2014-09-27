@@ -7,30 +7,31 @@
 
 var amount = 10;
 var colors = ['blue','red','pink','yellow'];
-radius = view.size.width/5;
-
-for (var i = amount; i > 0; i= i -1){
-    var disc = new Path.Circle(new Point(view.center), radius*i/amount);
-
-    disc.fillColor = colors[i % 4];
-}
-
-
-// var discs = [];
+// var radius = view.size/3;
+var radius = view.size.width/5;
 
 // for (var i = amount; i > 0; i= i -1){
-//     discs.push(new Path.Circle(new Point(view.center), radius*i/amount));
+//     var disc = new Path.Circle(new Point(view.center), radius*i/amount);
 
-//     discs[amount - i].fillColor = colors[i % 4];
+//     disc.fillColor = colors[i % 4];
 // }
 
-function onFrame(event){
-  // for (var i = amount; i > 0; i= i - 1){
-  //   // var disc = new Path.Circle(new Point(view.center), radius*i/amount);
-  // disc.radius = radius*Math.random()/10;
 
-  //   disc.fillColor = colors[i % 4];
+var discs = [];
+
+for (var i = amount; i > 0; i= i -1){
+    discs.push(new Path.Circle(new Point(view.center), radius*i/amount));
+    discs[amount - i].fillColor = colors[i % 4];
+}
+
+function onFrame(event){
+  // for (var i = 0; i < amount; i++){
+  //   discs[i].rotate(4);
   // }
+  for (var i = amount; i > 0; i= i -1){
+    discs[i] = new Path.Circle(new Point(view.center), radius*i*Math.random()/amount);
+    discs[amount - i].fillColor = colors[i % 4];
+  }
 
 }
 
