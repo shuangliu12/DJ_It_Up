@@ -5,43 +5,38 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 <script type="text/paperscript" canvas="myCanvas">
 
-var amount = 10;
-var colors = ['blue','red','pink','yellow'];
-// var radius = view.size/3;
-var radius = view.size.width/5;
+var amount = 15;
+var colors = ['db0e39','2872c7'];
 
-// for (var i = amount; i > 0; i= i -1){
-//     var disc = new Path.Circle(new Point(view.center), radius*i/amount);
+var rectangle = new Rectangle(new Point(20, 20), new Size(view.size.width/3, view.size.width/3 + 10));
+var disc = new Path.Ellipse(rectangle);
+disc.position = view.center;
+var discHole = disc.clone();
+discHole.scale(0.15);
+discHole.fillColor='black';
 
-//     disc.fillColor = colors[i % 4];
-// }
 
+discs = [];
+discs.push(disc);
 
-var discs = [];
-
-for (var i = amount; i > 0; i= i -1){
-    discs.push(new Path.Circle(new Point(view.center), radius*i/amount));
-    discs[amount - i].fillColor = colors[i % 4];
+for (var i = amount; i > 0; i = i-1){
+  var copy = disc.clone();
+  scale = 1 - i/amount;
+  copy.scale(scale);
+  discs.push(copy);
+  discs[amount - i].fillColor = colors[i % 2];
 }
 
-function onFrame(event){
-  // for (var i = 0; i < amount; i++){
-  //   discs[i].rotate(4);
-  // }
-  for (var i = amount; i > 0; i= i -1){
-    discs[i] = new Path.Circle(new Point(view.center), radius*i*Math.random()/amount);
-    discs[amount - i].fillColor = colors[i % 4];
+function onMouseMove(event){
+  if disc[0]
+  for (var i = 0; i < amount; i++){
+    discs[i].rotate(3);
   }
-
 }
-
 </script>
 </head>
-<body>
-<!--   <audio id = "sound" controls="controls" preload="auto">
-  <source src="music.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio> -->
+<body bgcolor='black'>
+
   <canvas id="myCanvas", resize></canvas>
      <script>
 
