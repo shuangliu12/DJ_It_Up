@@ -3,45 +3,140 @@
 <head>
 <script type="text/javascript" src="paper.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-<script type="text/paperscript" canvas="myCanvas">
+<script type="text/paperscript" canvas="disc">
+var audio = new Audio();
+audio.src = 'Low.mp3';
+audio.controls = true;
+audio.loop = false;
+audio.autoplay = false;
+initMp3Player();
+var analyser;
 
-var amount = 15;
-var colors = ['db0e39','2872c7'];
+function initMp3Player(){
+document.getElementById('audio_box').appendChild(audio);
+var context = new AudioContext(); // AudioContext object instance
+analyser = context.createAnalyser(); // AnalyserNode method
+var source = context.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(context.destination);
+}
 
-var rectangle = new Rectangle(new Point(20, 20), new Size(view.size.width/3, view.size.width/3 + 10));
+
+//draw the discs
+var amount = 8;
+var colors = ['#db0e39','#2872c7'];
+if(view.size.width > view.size.height)
+var size = view.size.height;
+else
+var size = view.size.width;
+var rectangle = new Rectangle(new Point(20, 20), new Size(size, size - 30));
 var disc = new Path.Ellipse(rectangle);
 disc.position = view.center;
-var discHole = disc.clone();
-discHole.scale(0.15);
-discHole.fillColor='black';
 
-
-discs = [];
-discs.push(disc);
-
-for (var i = amount; i > 0; i = i-1){
-  var copy = disc.clone();
-  scale = 1 - i/amount;
-  copy.scale(scale);
-  discs.push(copy);
-  discs[amount - i].fillColor = colors[i % 2];
+var discs = [];
+for (var i = 0; i < amount; i = i+1){
+var copy = disc.clone();
+copy.scale((i+1)/amount);
+copy.fillColor = colors[i % 2];
+//copy.selected = true;
+discs.push(copy);
 }
 
-function onMouseMove(event){
-  if disc[0]
-  for (var i = 0; i < amount; i++){
-    discs[i].rotate(3);
+// var discHole = disc.clone();
+// discHole.scale(0.15);
+// discHole.fillColor='white';
+
+disc.remove();
+
+var numStars = 9;
+var starRad = 25;
+var starRadFactor = 1.6;
+//stars is the array of stars. starScaleFactor is an array of values to scale the star so that we have different sizes for stars.
+var stars, starScaleFactor;
+initStars(numStars);
+function initStars(numStars) {
+  stars = [];
+  starScaleFactor = [];
+  for(var i = 0; i < numStars; i++) {
+    var p = new Point(view.size.width, view.size.height/2) * Point.random() + [0,view.size.height+30];
+    stars.push(new Path.Star(p, 5, starRad, starRad*starRadFactor));
+    stars[i].fillColor = 'green';
+
+    starScaleFactor.push(getRandomStarScaleFactor());
   }
 }
+
+
+function getRandomStarScaleFactor() {
+  //return a random value to which the star will be scaled.
+  return Math.random()*1.75 + 0.75;
+}
+
+function onFrame(event){
+if(!audio.paused) {
+    for (var i = 0; i < amount; i++){
+      discs[i].rotate(3);
+    }
+
+
+    var fbc_array = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(fbc_array);
+    var sum = 0;
+    var n = 7;
+    var avg;
+    for(var i = 0; i < n; i++) {
+      sum += fbc_array[i];
+    }
+    if(sum == 0)
+      avg = 1;
+    else
+      avg = sum/n;
+    var size = starRad*avg/180;
+
+    for(var i = 0; i < numStars; i++) {
+      //if the star goes off of the screen, reset it with a new star at the bottom
+      if(stars[i].position.y < -20 || stars[i].position.y > view.size.height+75) {
+        stars[i].remove();
+        var p = new Point(view.size.width, view.size.height/2) * Point.random() + [0,view.size.height+30];
+        stars[i] = new Path.Star(p, 5, size, size*starRadFactor);
+        stars[i].fillColor = 'green';
+        starScaleFactor[i] = getRandomStarScaleFactor();
+      }
+      //move the star and update the color based on the music
+      else {
+        var s = stars[i].position;
+        stars[i].remove();
+        stars[i] = new Path.Star(s, 5, size, size*starRadFactor);
+        stars[i].fillColor = 'green';
+        stars[i].strokeColor = 'white';
+        stars[i].strokeWidth = 3;
+        //hue is out of 360 degrees. sound is represented up to 256 so multiply by 1.4
+        stars[i].fillColor.hue = avg*1.4;
+        stars[i].fillColor.brightness = 0.9;
+        stars[i].position.y = stars[i].position.y - 2 - 8/(starScaleFactor[i]);
+      }
+
+      stars[i].scale(starScaleFactor[i]);
+    }
+}
+//if the music is paused, slowly hide the stars
+else {
+  for(var i = 0; i < numStars; i++) {
+    var op = stars[i].opacity;
+    if(op > 0.02)
+      stars[i].opacity = op - 0.01;
+    else if (op != 0)
+      stars[i].opacity = 0;
+  }
+}
+}
 </script>
+
+
 </head>
 <body bgcolor='black'>
-
-  <canvas id="myCanvas", resize></canvas>
-     <script>
-
-    </script>
-
-
+<div id='player' style="width: 10; height: 10; float: left"></div>
+<canvas id="disc" resize></canvas>
+<div id="audio_box"></div>
 </body>
 </html>
